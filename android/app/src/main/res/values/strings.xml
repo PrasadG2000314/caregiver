@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Budget Dekoo</string>
+    <string name="title_activity_main">Budget Dekoo</string>
+    <string name="package_name">com.budgetdekoo.app</string>
+    <string name="custom_url_scheme">com.budgetdekoo.app</string>
+</resources>
