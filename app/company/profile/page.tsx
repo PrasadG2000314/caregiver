@@ -6,11 +6,21 @@ import { updateCompanyProfileAction } from '@/app/actions/profile-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { PDPABanner } from '@/components/pdpa-banner';
 import { MALAYSIAN_STATES, MALAYSIAN_CITIES } from '@/lib/malaysia-data';
-import { Building2, ShieldCheck, FileText, CheckCircle2, AlertCircle, UploadCloud } from 'lucide-react';
+import { 
+  Building2, 
+  ShieldCheck, 
+  FileText, 
+  CheckCircle2, 
+  AlertCircle, 
+  UploadCloud,
+  Download,
+  MapPin,
+  Sparkles,
+  Award
+} from 'lucide-react';
 
 export default function CompanyProfilePage() {
   const router = useRouter();
@@ -22,7 +32,7 @@ export default function CompanyProfilePage() {
   const [state, setState] = useState('Selangor');
   const [city, setCity] = useState('Petaling Jaya');
   const [description, setDescription] = useState(
-    'Premier home caregiving and hospice nursing agency serving the Klang Valley.'
+    'Premier home caregiving and hospice nursing agency serving the Klang Valley. Audited and certified under Suruhanjaya Syarikat Malaysia.'
   );
 
   const [documentPath, setDocumentPath] = useState('company-documents/comp1/ssm_cert.pdf');
@@ -30,12 +40,17 @@ export default function CompanyProfilePage() {
   const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
+  const handleStateChange = (newState: string) => {
+    setState(newState);
+    const cities = MALAYSIAN_CITIES[newState] || [];
+    setCity(cities[0] || '');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setSavedSuccess(false);
 
-    // Call update action
     const res = await updateCompanyProfileAction('10000000-0000-0000-0000-000000000001', {
       company_name: companyName,
       registration_number: registrationNumber,
@@ -54,161 +69,186 @@ export default function CompanyProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Organization Profile & SSM Verification</h1>
-          <p className="text-xs text-slate-500">Manage Suruhanjaya Syarikat Malaysia (SSM) proof and business credentials</p>
+      
+      {/* Header */}
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">
+            <Building2 className="w-3.5 h-3.5" />
+            <span>Healthcare Agency Registry</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            Organization Profile & SSM Verification
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500">
+            Manage Suruhanjaya Syarikat Malaysia (SSM) proof and business credentials.
+          </p>
         </div>
 
         {isVerified ? (
-          <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 gap-1.5 py-1 px-3 border border-emerald-300">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span className="font-semibold text-xs">SSM Verified Agency</span>
-          </Badge>
+            <span>SSM Verified Agency</span>
+          </span>
         ) : (
-          <Badge variant="warning" className="gap-1.5 py-1 px-3">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
             <AlertCircle className="w-4 h-4 text-amber-600" />
-            <span className="font-semibold text-xs">Pending SSM Verification</span>
-          </Badge>
+            <span>Pending SSM Verification</span>
+          </span>
         )}
       </div>
 
       <PDPABanner compact />
 
       {savedSuccess && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-2xl flex items-center gap-2.5 shadow-xs animate-in fade-in duration-200">
           <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-          <span>Company profile details updated successfully!</span>
+          <span className="font-semibold">Company profile details and SSM registry information updated successfully!</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>1. Business Registration Details</CardTitle>
-            <CardDescription>Official business name and SSM registration as filed with Malaysian authorities</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6 text-xs">
+        
+        {/* Card 1: Business Details */}
+        <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-7 shadow-xs space-y-4">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-emerald-600" />
+              <span>1. Business Registration Details</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">Official business name and SSM registration as filed with Malaysian authorities</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700">Company Name</label>
+              <label className="font-semibold text-slate-700">Official Company Name</label>
               <Input
                 required
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
+                className="rounded-xl h-11 text-xs border-slate-200"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700">SSM Registration Number</label>
+              <label className="font-semibold text-slate-700">SSM Registration Number</label>
               <Input
                 required
                 value={registrationNumber}
                 onChange={(e) => setRegistrationNumber(e.target.value)}
-                placeholder="e.g. 202101099881 (1420181-T)"
+                className="rounded-xl h-11 text-xs font-mono border-slate-200"
               />
-              <p className="text-[11px] text-slate-400">
-                12-digit SSM Number or legacy Registration No. Verified against the SSM registry.
-              </p>
             </div>
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700">State</label>
-                <select
-                  value={state}
-                  onChange={(e) => setState(e.target.value)}
-                  className="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 bg-white"
-                >
-                  {MALAYSIAN_STATES.map((s) => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
+          <div className="space-y-1.5">
+            <label className="font-semibold text-slate-700">Agency Summary & Healthcare Scope</label>
+            <Textarea
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="rounded-xl text-xs border-slate-200"
+            />
+          </div>
+        </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-700">City / District</label>
-                <select
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="w-full h-10 px-3 text-sm rounded-lg border border-slate-300 bg-white"
-                >
-                  {(MALAYSIAN_CITIES[state] || []).map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
+        {/* Card 2: Operating Address */}
+        <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-7 shadow-xs space-y-4">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-teal-600" />
+              <span>2. Operating Address & Coverage Area</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">Physical office or clinical facility address in Malaysia</p>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="font-semibold text-slate-700">Address Line</label>
+            <Input
+              required
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="rounded-xl h-11 text-xs border-slate-200"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="font-semibold text-slate-700">State / Federal Territory</label>
+              <select
+                value={state}
+                onChange={(e) => handleStateChange(e.target.value)}
+                className="w-full h-11 px-3.5 text-xs rounded-xl border border-slate-200 bg-white font-medium text-slate-700"
+              >
+                {MALAYSIAN_STATES.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700">Operating Address</label>
-              <Input
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Street address, building, floor"
-              />
+              <label className="font-semibold text-slate-700">City / District</label>
+              <select
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full h-11 px-3.5 text-xs rounded-xl border border-slate-200 bg-white font-medium text-slate-700"
+              >
+                {(MALAYSIAN_CITIES[state] || []).map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
             </div>
+          </div>
+        </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-700">Agency Bio & Scope of Care</label>
-              <Textarea
-                rows={3}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </div>
-          </CardContent>
-        </Card>
+        {/* Card 3: SSM Verification Document Vault */}
+        <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-7 shadow-xs space-y-4">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Award className="w-4 h-4 text-emerald-600" />
+              <span>3. SSM Certificate Document Vault</span>
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Proof filed with Suruhanjaya Syarikat Malaysia. Served exclusively through signed URLs.
+            </p>
+          </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>2. SSM Verification Document</CardTitle>
-            <CardDescription>
-              Stored in Supabase private bucket (`company-documents`). Serviced strictly via signed URLs.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-emerald-100 text-emerald-700 rounded-lg">
-                  <FileText className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="font-semibold text-xs text-slate-800">SSM Certificate of Incorporation</p>
-                  <p className="text-[11px] text-slate-400 font-mono">{documentPath}</p>
-                </div>
+          <div className="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-emerald-100 text-emerald-700 rounded-xl">
+                <FileText className="w-5 h-5" />
               </div>
-
-              <a
-                href={`/api/documents/download?bucket=company-documents&path=${encodeURIComponent(documentPath)}&token=auth_demo&expires=${Date.now() + 300000}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-lg bg-white border border-slate-300 text-xs font-semibold text-emerald-700 hover:bg-slate-50"
-              >
-                View Stored PDF
-              </a>
+              <div>
+                <p className="font-bold text-xs text-slate-900">SSM Business Registration Certificate (Form 9 / Section 17)</p>
+                <p className="text-[11px] text-slate-400 font-mono">{documentPath}</p>
+              </div>
             </div>
 
-            <div className="p-4 border-2 border-dashed border-slate-200 rounded-xl text-center space-y-2">
-              <UploadCloud className="w-8 h-8 text-slate-400 mx-auto" />
-              <p className="text-xs font-semibold text-slate-700">Upload Updated SSM Document (PDF)</p>
-              <p className="text-[11px] text-slate-400">Max file size 5MB. Must be valid SSM Form 9 or Suruhanjaya Syarikat certificate.</p>
-              <button
-                type="button"
-                onClick={() => alert('Demo simulated upload: Document encrypted and saved to company-documents/comp1/ssm_cert.pdf')}
-                className="px-3 py-1.5 bg-slate-100 text-slate-700 hover:bg-slate-200 text-xs font-semibold rounded-lg"
-              >
-                Select File
-              </button>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-end">
-            <Button type="submit" disabled={saving}>
-              {saving ? 'Saving...' : 'Save Profile Changes'}
-            </Button>
-          </CardFooter>
-        </Card>
+            <a
+              href={`/api/documents/download?bucket=company-documents&path=${encodeURIComponent(documentPath)}&token=auth_demo&expires=${Date.now() + 300000}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 rounded-xl bg-white border border-slate-300 text-xs font-bold text-emerald-700 hover:bg-slate-50 flex items-center gap-1.5 shadow-2xs transition-all hover:scale-[1.02] shrink-0"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download SSM PDF</span>
+            </a>
+          </div>
+        </div>
+
+        {/* Submit */}
+        <div className="flex justify-end gap-3 pt-2">
+          <Button
+            type="submit"
+            disabled={saving}
+            className="px-7 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-xs font-bold shadow-md shadow-emerald-600/20 transition-all hover:scale-[1.01]"
+          >
+            {saving ? 'Saving...' : 'Update Organization Profile'}
+          </Button>
+        </div>
+
       </form>
+
     </div>
   );
 }
-

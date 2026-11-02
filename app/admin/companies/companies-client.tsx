@@ -16,7 +16,8 @@ import {
   ExternalLink,
   MapPin,
   Calendar,
-  Sparkles
+  Sparkles,
+  AlertTriangle
 } from 'lucide-react';
 
 interface Props {
@@ -49,7 +50,9 @@ export function AdminCompaniesClient({ initialCompanies, adminId }: Props) {
         return (
           <div
             key={comp.id}
-            className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-7 shadow-xs hover-lift transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
+            className={`bg-white rounded-3xl border p-6 sm:p-7 shadow-xs hover-lift transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-6 ${
+              isVerified ? 'border-slate-200/90' : 'border-amber-300/80 bg-amber-50/15'
+            }`}
           >
             <div className="space-y-3 max-w-2xl text-xs">
               <div className="flex flex-wrap items-center gap-2.5">
@@ -72,7 +75,7 @@ export function AdminCompaniesClient({ initialCompanies, adminId }: Props) {
 
               <p className="text-slate-600 leading-relaxed font-normal">{comp.description}</p>
 
-              <div className="flex flex-wrap items-center gap-3 text-slate-500">
+              <div className="flex flex-wrap items-center gap-2 text-slate-500">
                 <span className="flex items-center gap-1 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded-lg">
                   <MapPin className="w-3.5 h-3.5 text-slate-400" />
                   {comp.address ? `${comp.address}, ` : ''}{comp.city}, {comp.state}
@@ -104,17 +107,16 @@ export function AdminCompaniesClient({ initialCompanies, adminId }: Props) {
               )}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex md:flex-col items-center md:items-end gap-2.5 w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-slate-100">
+            <div className="flex flex-wrap md:flex-col items-center md:items-end gap-2.5 w-full md:w-auto pt-4 md:pt-0 border-t md:border-t-0 border-slate-100">
               {!isVerified ? (
                 <Button
                   size="sm"
                   onClick={() => handleVerify(comp.id, true)}
                   disabled={loadingId === comp.id}
-                  className="gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-xs font-bold w-full sm:w-auto rounded-xl shadow-xs px-4 py-2"
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5 rounded-xl shadow-xs w-full sm:w-auto px-4 py-2"
                 >
                   <ShieldCheck className="w-4 h-4" />
-                  <span>Approve & Verify Agency</span>
+                  <span>Approve SSM & Grant Verification</span>
                 </Button>
               ) : (
                 <Button
@@ -122,10 +124,10 @@ export function AdminCompaniesClient({ initialCompanies, adminId }: Props) {
                   variant="outline"
                   onClick={() => handleVerify(comp.id, false)}
                   disabled={loadingId === comp.id}
-                  className="text-xs text-rose-600 hover:text-rose-700 border-rose-200 hover:bg-rose-50 rounded-xl font-bold"
+                  className="text-amber-700 border-amber-200 hover:bg-amber-50 text-xs font-semibold rounded-xl w-full sm:w-auto px-4 py-2"
                 >
-                  <XCircle className="w-3.5 h-3.5 mr-1" />
-                  Revoke Verification
+                  <AlertTriangle className="w-3.5 h-3.5 mr-1" />
+                  Revoke Verification Badge
                 </Button>
               )}
             </div>
