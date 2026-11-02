@@ -1,26 +1,4 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/api/documents/download/route": "app/api/documents/download/route.js",
-  "/admin/audit-logs/page": "app/admin/audit-logs/page.js",
-  "/admin/dashboard/page": "app/admin/dashboard/page.js",
-  "/auth/login/page": "app/auth/login/page.js",
-  "/auth/account-status/page": "app/auth/account-status/page.js",
-  "/admin/companies/page": "app/admin/companies/page.js",
-  "/admin/users/page": "app/admin/users/page.js",
-  "/admin/complaints/page": "app/admin/complaints/page.js",
-  "/auth/forgot-password/page": "app/auth/forgot-password/page.js",
-  "/auth/reset-password/page": "app/auth/reset-password/page.js",
-  "/caregiver/jobs/page": "app/caregiver/jobs/page.js",
-  "/caregiver/profile/page": "app/caregiver/profile/page.js",
-  "/caregiver/applications/page": "app/caregiver/applications/page.js",
-  "/company/bookings/page": "app/company/bookings/page.js",
-  "/caregiver/bookings/page": "app/caregiver/bookings/page.js",
-  "/auth/register/page": "app/auth/register/page.js",
-  "/company/jobs/[id]/applicants/page": "app/company/jobs/[id]/applicants/page.js",
-  "/company/dashboard/page": "app/company/dashboard/page.js",
-  "/company/profile/page": "app/company/profile/page.js",
-  "/company/jobs/page": "app/company/jobs/page.js",
-  "/company/jobs/new/page": "app/company/jobs/new/page.js",
-  "/notifications/page": "app/notifications/page.js",
-  "/page": "app/page.js"
+  "/notifications/page": "app/notifications/page.js"
 }
