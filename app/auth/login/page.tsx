@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { loginAction } from '@/app/actions/auth-actions';
+import { loginAction, sendOTPAction } from '@/app/actions/auth-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PDPABanner } from '@/components/pdpa-banner';
@@ -23,7 +23,10 @@ import {
   Mail,
   Eye,
   EyeOff,
-  Zap
+  Zap,
+  KeyRound,
+  Send,
+  Timer
 } from 'lucide-react';
 
 const QUICK_TEST_USERS = [
@@ -58,18 +61,34 @@ const QUICK_TEST_USERS = [
 
 export default function LoginPage() {
   const router = useRouter();
+  
+  // Auth Modes: 'password' | 'otp'
+  const [authMode, setAuthMode] = useState<'password' | 'otp'>('password');
+  
   const [email, setEmail] = useState('admin@damaicare.com.my');
   const [password, setPassword] = useState('password123');
+  const [otpCode, setOtpCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Feedback states
   const [error, setError] = useState<string | null>(null);
+  const [successNotice, setSuccessNotice] = useState<string | null>(null);
+  const [previewOtp, setPreviewOtp] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sendingOtp, setSendingOtp] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const res = await loginAction({ email });
+    const res = await loginAction({
+      email,
+      password: authMode === 'password' ? password : undefined,
+      otpCode: authMode === 'otp' ? otpCode : undefined,
+      mode: authMode,
+    });
+    
     setLoading(false);
 
     if (res.success && res.user) {
@@ -83,16 +102,41 @@ export default function LoginPage() {
         router.push('/');
       }
     } else {
-      setError(res.error || 'Failed to login');
+      setError(res.error || 'Failed to authenticate.');
+    }
+  };
+
+  const handleSendOtp = async () => {
+    if (!email) {
+      setError('Please enter your email address to receive a passcode.');
+      return;
+    }
+
+    setSendingOtp(true);
+    setError(null);
+    setSuccessNotice(null);
+
+    const res = await sendOTPAction(email);
+    setSendingOtp(false);
+
+    if (res.success) {
+      setSuccessNotice(res.message || 'Passcode dispatched.');
+      if (res.previewCode) {
+        setPreviewOtp(res.previewCode);
+        setOtpCode(res.previewCode); // auto-fill for testing convenience
+      }
+    } else {
+      setError(res.error || 'Failed to send passcode.');
     }
   };
 
   const handleQuickLogin = async (userEmail: string) => {
     setEmail(userEmail);
+    setPassword('password123');
     setLoading(true);
     setError(null);
 
-    const res = await loginAction({ email: userEmail });
+    const res = await loginAction({ email: userEmail, password: 'password123', mode: 'password' });
     setLoading(false);
 
     if (res.success && res.user) {
@@ -176,11 +220,11 @@ export default function LoginPage() {
             <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300">
               <div className="flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>PDPA 2010 RLS Shield</span>
+                <span>PBKDF2 Password Hashing</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>SSM Audited Agencies</span>
+                <span>HMAC Signed Sessions</span>
               </div>
             </div>
           </div>
@@ -191,11 +235,39 @@ export default function LoginPage() {
         <div className="lg:col-span-7 flex flex-col justify-center">
           <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-9 shadow-xs space-y-6">
             
-            <div className="space-y-1">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Welcome back</h2>
-              <p className="text-xs text-slate-500">
-                Sign in with your registered Malaysian account credentials or use quick test evaluator access below.
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Secure Sign In</h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Choose password authentication or one-time magic passcode
+                </p>
+              </div>
+
+              {/* Mode Toggle Switch */}
+              <div className="inline-flex p-1 bg-slate-100 rounded-xl text-xs font-semibold self-start sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('password'); setError(null); }}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${
+                    authMode === 'password'
+                      ? 'bg-white text-slate-900 shadow-xs font-bold'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  Password
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('otp'); setError(null); }}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${
+                    authMode === 'otp'
+                      ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  ⚡ Magic Passcode
+                </button>
+              </div>
             </div>
 
             {/* Quick 1-Click Test Personas */}
@@ -203,68 +275,83 @@ export default function LoginPage() {
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                   <Zap className="w-3.5 h-3.5 text-amber-500" />
-                  <span>1-Click Evaluator Access</span>
+                  <span>1-Click Test Personas (Pre-Seeded)</span>
                 </span>
                 <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                  Instant Test Sign-in
+                  Instant Access
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                {QUICK_TEST_USERS.map((user) => {
-                  const Icon = user.icon;
-                  return (
-                    <button
-                      key={user.email}
-                      type="button"
-                      onClick={() => handleQuickLogin(user.email)}
-                      disabled={loading}
-                      className={`p-3 rounded-2xl border text-left flex flex-col justify-between transition-all hover:-translate-y-0.5 hover:shadow-sm ${user.badgeColor} group`}
-                    >
-                      <div className="flex items-center justify-between w-full">
-                        <div className="relative">
-                          <Image
-                            src={user.avatar}
-                            alt={user.name}
-                            width={32}
-                            height={32}
-                            className="w-8 h-8 rounded-full object-cover ring-2 ring-white"
-                          />
-                        </div>
-                        <span className="text-[10px] font-bold bg-white/80 px-1.5 py-0.5 rounded-md">
-                          {user.tag}
-                        </span>
+                {QUICK_TEST_USERS.map((user) => (
+                  <button
+                    key={user.email}
+                    type="button"
+                    onClick={() => handleQuickLogin(user.email)}
+                    disabled={loading}
+                    className={`p-3 rounded-2xl border text-left flex flex-col justify-between transition-all hover:-translate-y-0.5 hover:shadow-sm ${user.badgeColor} group`}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <div className="relative">
+                        <Image
+                          src={user.avatar}
+                          alt={user.name}
+                          width={32}
+                          height={32}
+                          className="w-8 h-8 rounded-full object-cover ring-2 ring-white"
+                        />
                       </div>
-                      <div className="mt-2.5">
-                        <p className="font-bold text-xs truncate group-hover:text-emerald-950">{user.name}</p>
-                        <p className="text-[10px] opacity-75 truncate">{user.role}</p>
-                      </div>
-                    </button>
-                  );
-                })}
+                      <span className="text-[10px] font-bold bg-white/80 px-1.5 py-0.5 rounded-md">
+                        {user.tag}
+                      </span>
+                    </div>
+                    <div className="mt-2.5">
+                      <p className="font-bold text-xs truncate group-hover:text-emerald-950">{user.name}</p>
+                      <p className="text-[10px] opacity-75 truncate">{user.role}</p>
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Divider */}
             <div className="relative flex py-1 items-center">
               <div className="flex-grow border-t border-slate-100"></div>
-              <span className="flex-shrink mx-4 text-[11px] text-slate-400 font-medium">Or enter your email</span>
+              <span className="flex-shrink mx-4 text-[11px] text-slate-400 font-medium">
+                {authMode === 'password' ? 'Or enter account credentials' : 'Or sign in with 6-digit magic code'}
+              </span>
               <div className="flex-grow border-t border-slate-100"></div>
             </div>
 
+            {/* Active Feedback Alerts */}
+            {error && (
+              <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2.5 text-xs animate-fade-in">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {successNotice && (
+              <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-center justify-between gap-2.5 text-xs animate-fade-in">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+                  <span>{successNotice}</span>
+                </div>
+                {previewOtp && (
+                  <span className="font-mono bg-white px-2 py-0.5 rounded font-black text-emerald-800 border border-emerald-300">
+                    PIN: {previewOtp}
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-              {error && (
-                <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2.5 text-xs animate-fade-in">
-                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
-                  <span>{error}</span>
-                </div>
-              )}
-
+              
               <div className="space-y-1.5">
                 <label className="font-semibold text-slate-700 flex items-center gap-1.5">
                   <Mail className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Registered Email Address</span>
+                  <span>Registered Malaysian Email</span>
                 </label>
                 <Input
                   type="email"
@@ -276,41 +363,77 @@ export default function LoginPage() {
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="font-semibold text-slate-700 flex items-center gap-1.5">
-                    <Lock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Password</span>
-                  </label>
-                  <Link href="/auth/forgot-password" className="text-emerald-700 hover:text-emerald-800 font-semibold text-[11px]">
-                    Forgot password?
-                  </Link>
+              {/* Password Mode Fields */}
+              {authMode === 'password' && (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="font-semibold text-slate-700 flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Password</span>
+                    </label>
+                    <Link href="/auth/forgot-password" className="text-emerald-700 hover:text-emerald-800 font-semibold text-[11px]">
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="rounded-xl h-11 text-xs pr-10 border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
-                <div className="relative">
+              )}
+
+              {/* Magic OTP Mode Fields */}
+              {authMode === 'otp' && (
+                <div className="space-y-3 p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
+                  <div className="flex items-center justify-between">
+                    <label className="font-semibold text-slate-800 flex items-center gap-1.5">
+                      <KeyRound className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>6-Digit Security Passcode</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleSendOtp}
+                      disabled={sendingOtp}
+                      className="text-emerald-700 hover:text-emerald-800 font-bold text-xs flex items-center gap-1"
+                    >
+                      <Send className="w-3 h-3" />
+                      <span>{sendingOtp ? 'Sending...' : 'Request Passcode'}</span>
+                    </button>
+                  </div>
                   <Input
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="rounded-xl h-11 text-xs pr-10 border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
+                    type="text"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                    placeholder="Enter 6-digit code (e.g. 849201)"
+                    className="rounded-xl h-11 text-sm tracking-widest font-mono text-center bg-white border-emerald-200"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
+                  <p className="text-[11px] text-slate-500 flex items-center gap-1">
+                    <Timer className="w-3 h-3 text-slate-400" />
+                    <span>Single-use code expires after 5 minutes.</span>
+                  </p>
                 </div>
-              </div>
+              )}
 
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-11 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 font-bold text-xs shadow-md shadow-emerald-600/20 transition-all"
+                className="w-full h-11 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 font-bold text-xs shadow-md shadow-emerald-600/20 transition-all hover:scale-[1.01]"
               >
-                {loading ? 'Authenticating...' : 'Sign In to Portal'}
+                {loading ? 'Authenticating...' : authMode === 'password' ? 'Sign In with Password' : 'Verify Passcode & Sign In'}
               </Button>
             </form>
 

@@ -1,1 +1,221 @@
-{"version":3,"caseSensitive":false,"basePath":"","rewrites":{"beforeFiles":[],"afterFiles":[],"fallback":[]},"redirects":[{"source":"/:path+/","destination":"/:path+","permanent":true,"internal":true,"regex":"^(?:\\/((?:[^\\/]+?)(?:\\/(?:[^\\/]+?))*))\\/$"}],"headers":[{"source":"/(.*)","headers":[{"key":"X-DNS-Prefetch-Control","value":"on"},{"key":"Strict-Transport-Security","value":"max-age=63072000; includeSubDomains; preload"},{"key":"X-XSS-Protection","value":"1; mode=block"},{"key":"X-Frame-Options","value":"DENY"},{"key":"X-Content-Type-Options","value":"nosniff"},{"key":"Referrer-Policy","value":"strict-origin-when-cross-origin"},{"key":"Permissions-Policy","value":"camera=(), microphone=(), geolocation=(), browsing-topics=()"},{"key":"Content-Security-Policy","value":"default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://images.unsplash.com https://*; font-src 'self' data:; connect-src 'self' https://* wss://*; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"}],"regex":"^(?:\\/(.*))(?:\\/)?$"}]}
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-DNS-Prefetch-Control",
+          "value": "on"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), browsing-topics=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://images.unsplash.com https://*; font-src 'self' data:; connect-src 'self' https://* wss://*; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+        }
+      ],
+      "regex": "^(?:/(.*))(?:/)?$"
+    }
+  ],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/company/jobs/[id]/applicants",
+      "regex": "^/company/jobs/([^/]+?)/applicants(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/company/jobs/(?<nxtPid>[^/]+?)/applicants(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin/audit-logs",
+      "regex": "^/admin/audit\\-logs(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/audit\\-logs(?:/)?$"
+    },
+    {
+      "page": "/admin/companies",
+      "regex": "^/admin/companies(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/companies(?:/)?$"
+    },
+    {
+      "page": "/admin/complaints",
+      "regex": "^/admin/complaints(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/complaints(?:/)?$"
+    },
+    {
+      "page": "/admin/dashboard",
+      "regex": "^/admin/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/dashboard(?:/)?$"
+    },
+    {
+      "page": "/admin/users",
+      "regex": "^/admin/users(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/users(?:/)?$"
+    },
+    {
+      "page": "/auth/account-status",
+      "regex": "^/auth/account\\-status(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/account\\-status(?:/)?$"
+    },
+    {
+      "page": "/auth/forgot-password",
+      "regex": "^/auth/forgot\\-password(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/forgot\\-password(?:/)?$"
+    },
+    {
+      "page": "/auth/login",
+      "regex": "^/auth/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/login(?:/)?$"
+    },
+    {
+      "page": "/auth/register",
+      "regex": "^/auth/register(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/register(?:/)?$"
+    },
+    {
+      "page": "/auth/reset-password",
+      "regex": "^/auth/reset\\-password(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/reset\\-password(?:/)?$"
+    },
+    {
+      "page": "/caregiver/applications",
+      "regex": "^/caregiver/applications(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/caregiver/applications(?:/)?$"
+    },
+    {
+      "page": "/caregiver/bookings",
+      "regex": "^/caregiver/bookings(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/caregiver/bookings(?:/)?$"
+    },
+    {
+      "page": "/caregiver/jobs",
+      "regex": "^/caregiver/jobs(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/caregiver/jobs(?:/)?$"
+    },
+    {
+      "page": "/caregiver/profile",
+      "regex": "^/caregiver/profile(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/caregiver/profile(?:/)?$"
+    },
+    {
+      "page": "/company/bookings",
+      "regex": "^/company/bookings(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/company/bookings(?:/)?$"
+    },
+    {
+      "page": "/company/dashboard",
+      "regex": "^/company/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/company/dashboard(?:/)?$"
+    },
+    {
+      "page": "/company/jobs",
+      "regex": "^/company/jobs(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/company/jobs(?:/)?$"
+    },
+    {
+      "page": "/company/jobs/new",
+      "regex": "^/company/jobs/new(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/company/jobs/new(?:/)?$"
+    },
+    {
+      "page": "/company/profile",
+      "regex": "^/company/profile(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/company/profile(?:/)?$"
+    },
+    {
+      "page": "/notifications",
+      "regex": "^/notifications(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/notifications(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}
